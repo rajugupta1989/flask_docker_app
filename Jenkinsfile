@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repo') {
+        stage('Git Pull') {
             steps {
-                // Optional if you're already using a local copy
-                git 'https://github.com/rajugupta1989/flask_docker_app.git'
+                git url: 'https://github.com/rajugupta1989/flask_docker_app.git', branch: 'main'
             }
         }
 
@@ -15,9 +14,14 @@ pipeline {
             }
         }
 
-        stage('Run Docker Container') {
+        stage('Remove Old Container') {
             steps {
                 sh 'docker rm -f flask-container || true'
+            }
+        }
+
+        stage('Run New Container') {
+            steps {
                 sh 'docker run -d --name flask-container -p 5000:5000 flask-app'
             }
         }
@@ -25,7 +29,7 @@ pipeline {
 
     post {
         always {
-            echo 'Cleaning up...'
+            echo '✅ Build complete.'
         }
     }
 }
