@@ -2,28 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Clone Repo') {
             steps {
-                git 'https://github.com/your-username/flask-docker-app.git'
+                // Optional if you're already using a local copy
+                git 'https://github.com/rajugupta1989/flask_docker_app.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t flask-docker-app .'
+                sh 'docker build -t flask-app .'
             }
         }
 
-        stage('Run Container') {
+        stage('Run Docker Container') {
             steps {
-                sh 'docker run -d -p 5000:5000 --name flask_app flask-docker-app'
+                sh 'docker rm -f flask-container || true'
+                sh 'docker run -d --name flask-container -p 5000:5000 flask-app'
             }
         }
     }
 
     post {
         always {
-            sh 'docker rm -f flask_app || true'
+            echo 'Cleaning up...'
         }
     }
 }
