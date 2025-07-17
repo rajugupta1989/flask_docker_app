@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     options {
-        timestamps() // Show timestamps in console log
+        timestamps()
     }
 
     stages {
@@ -23,7 +23,14 @@ pipeline {
         stage('Stop Old Container') {
             steps {
                 echo '🛑 Stopping old container if exists...'
-                sh 'docker rm -f flask-container || true'
+                sh '''
+                    if [ "$(docker ps -a -q -f name=flask-container)" ]; then
+                        echo "Removing existing container..."
+                        docker rm -f flask-container
+                    else
+                        echo "No existing container found."
+                    fi
+                '''
             }
         }
 
