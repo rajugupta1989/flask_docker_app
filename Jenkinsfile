@@ -7,7 +7,7 @@ pipeline {
 
     stages {
 
-        stage('Declarative: Checkout SCM') {
+        stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/rajugupta1989/flask_docker_app.git', branch: 'main'
             }
@@ -20,15 +20,19 @@ pipeline {
             }
         }
 
-        stage('Stop Old Container') {
+        stage('Stop and Remove Old Container') {
             steps {
-                echo '🛑 Stopping old container if exists...'
+                echo '🛑 Checking and stopping existing container...'
                 sh '''
-                    if [ "$(docker ps -a -q -f name=flask-container)" ]; then
+                    CONTAINER_NAME=flask-container
+                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Stopping running container..."
+                        docker stop $CONTAINER_NAME
+                    fi
+
+                    if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
                         echo "Removing existing container..."
-                        docker rm -f flask-container
-                    else
-                        echo "No existing container found."
+                        docker rm $CONTAINER_NAME
                     fi
                 '''
             }
@@ -40,7 +44,6 @@ pipeline {
                 sh 'docker run -d --name flask-container -p 5000:5000 flask-app'
             }
         }
-
     }
 
     post {
