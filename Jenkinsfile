@@ -2,19 +2,14 @@ pipeline {
     agent any
 
     options {
-        timestamps()
-    }
-
-    triggers {
-        // This enables the build trigger when GitHub sends a webhook
-        githubPush()
+        timestamps() // Show timestamps in console log
     }
 
     stages {
 
         stage('Declarative: Checkout SCM') {
             steps {
-                checkout scm
+                git url: 'https://github.com/rajugupta1989/flask_docker_app.git', branch: 'main'
             }
         }
 
@@ -38,6 +33,7 @@ pipeline {
                 sh 'docker run -d --name flask-container -p 5000:5000 flask-app'
             }
         }
+
     }
 
     post {
