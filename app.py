@@ -8,7 +8,7 @@ def home():
 
 @app.route("/raju")
 def test():
-    return "Hello raju from Dockerized Flask + Jenkins!"
+    return "Hello raju"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
