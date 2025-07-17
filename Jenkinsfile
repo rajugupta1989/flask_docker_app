@@ -28,23 +28,23 @@ pipeline {
 
         stage('Stop and Remove Old Container') {
             steps {
-                echo '🛑 Forcibly stopping and removing old container if it exists...'
+                echo '🛑 Stopping and removing old container...'
                 sh '''
                     CONTAINER_NAME=flask-container
 
-                    # Stop & remove
-                    if [ "$(sudo docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
                         echo "Stopping old container..."
-                        sudo docker stop $CONTAINER_NAME || true
+                        docker stop $CONTAINER_NAME || true
                     fi
 
-                    if [ "$(sudo docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
+                    if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
                         echo "Removing old container..."
-                        sudo docker rm -f $CONTAINER_NAME || true
+                        docker rm -f $CONTAINER_NAME || true
                     fi
                 '''
             }
         }
+
 
 
 
