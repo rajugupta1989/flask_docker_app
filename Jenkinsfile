@@ -5,10 +5,16 @@ pipeline {
         timestamps()
     }
 
-    stages {
+    environment {
+        CONTAINER_NAME = "flask-container"
+        IMAGE_NAME = "flask-app"
+        PORT = "5000"
+    }
 
+    stages {
         stage('Checkout Code') {
             steps {
+                echo '🔄 Checking out code...'
                 git url: 'https://github.com/rajugupta1989/flask_docker_app.git', branch: 'main'
             }
         }
@@ -16,23 +22,22 @@ pipeline {
         stage('Docker Build') {
             steps {
                 echo '🔧 Building Docker image...'
-                sh 'docker build -t flask-app .'
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Stop and Remove Old Container') {
             steps {
-                echo '🛑 Checking and stopping existing container...'
+                echo '🛑 Stopping and removing old container if exists...'
                 sh '''
-                    CONTAINER_NAME=flask-container
                     if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Stopping running container..."
-                        docker stop $CONTAINER_NAME
+                        echo "Stopping container $CONTAINER_NAME..."
+                        docker stop $CONTAINER_NAME || true
                     fi
 
                     if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Removing existing container..."
-                        docker rm $CONTAINER_NAME
+                        echo "Removing container $CONTAINER_NAME..."
+                        docker rm $CONTAINER_NAME || true
                     fi
                 '''
             }
@@ -41,7 +46,12 @@ pipeline {
         stage('Run New Container') {
             steps {
                 echo '🚀 Running new Docker container...'
-                sh 'docker run -d --name flask-container -p 5000:5000 flask-app'
+                sh '''
+                    docker run -d \
+                        --name $CONTAINER_NAME \
+                        -p $PORT:5000 \
+                        $IMAGE_NAME
+                '''
             }
         }
     }
@@ -49,6 +59,9 @@ pipeline {
     post {
         always {
             echo '✅ CI/CD pipeline run complete.'
+        }
+        failure {
+            echo '❌ Pipeline failed.'
         }
     }
 }
