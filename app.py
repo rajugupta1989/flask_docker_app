@@ -10,9 +10,9 @@ def home():
 def test():
     return "Hello raju"
 
-@app.route("/gupta")
+@app.route("/test")
 def test1():
-    return "Hello gupta"
+    return "Hello test"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
