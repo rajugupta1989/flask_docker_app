@@ -31,21 +31,22 @@ pipeline {
                 echo '🛑 Stopping and removing old container...'
                 sh '''
                     CONTAINER_NAME=flask-container
+                    DOCKER_CMD="/snap/bin/docker"
 
-                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Stopping old container..."
-                        docker stop $CONTAINER_NAME || true
+                    if [ "$($DOCKER_CMD ps -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Stopping container..."
+                        sudo $DOCKER_CMD stop $CONTAINER_NAME || true
                     fi
 
-                    if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Removing old container..."
-                        docker rm -f $CONTAINER_NAME || true
+                    if [ "$($DOCKER_CMD ps -a -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Removing container..."
+                        sudo $DOCKER_CMD rm -f $CONTAINER_NAME || true
                     fi
                 '''
+
+
             }
         }
-
-
 
 
         stage('Run New Container') {
