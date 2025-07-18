@@ -32,14 +32,16 @@ pipeline {
                 sh '''
                     CONTAINER_NAME=flask-container
 
-                    if [ "$(sudo /usr/bin/docker ps -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Stopping container $CONTAINER_NAME..."
-                        sudo /usr/bin/docker stop $CONTAINER_NAME || true
+                    # Stop container if running
+                    if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Stopping old container..."
+                        docker stop $CONTAINER_NAME || true
                     fi
 
-                    if [ "$(sudo /usr/bin/docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
-                        echo "Removing container $CONTAINER_NAME..."
-                        sudo /usr/bin/docker rm -f $CONTAINER_NAME || true
+                    # Remove container if exists
+                    if [ "$(docker ps -a -q -f name=$CONTAINER_NAME)" ]; then
+                        echo "Removing old container..."
+                        docker rm -f $CONTAINER_NAME || true
                     fi
                 '''
             }
